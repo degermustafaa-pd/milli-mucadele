@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Milli Mücadele Tekrarı</title>
+<meta name="theme-color" content="#b3121c" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#6a0d14" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Milli Mücadele">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday study tool for a 17-year-old: one obvious next step, no fuss
+   IDEA a 1919–22 field telegraph pad; every question arrives as a numbered dispatch slip
+   PICTURE the start panel: today's question count drawn large with one Başla button
+   COLOUR flag crimson band, white paper, near-black ink; olive for right, crimson for wrong, khaki between
+   TYPE Barlow Condensed 700 + Source Sans 3
+   LAYOUT slim crimson band, then start panel, then two tiles, then topic chips; phone keeps the same order */
+:root{color-scheme:light;--bg:#fff;--ink:#17131a;--soft:#5d5359;--line:#e4dcdc;--panel:#fff;--tint:#f6f1ef;--red:#b3121c;--btn:#b3121c;--band:#b3121c;--bandSoft:#ffdcd8;--ok:#3c6a1c;--okBg:#e9f2df;--badBg:#fbe6e5;--khaki:#a88d4a;--l0:#ddd5d5;--focus:#1f4fd1;--terrain:#e8e0cf;--terrainHi:#dcd1ba}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#141113;--ink:#f3ede9;--soft:#b8adb0;--line:#352d30;--panel:#1c181a;--tint:#231d20;--red:#ff6d64;--btn:#c42a2a;--band:#6a0d14;--bandSoft:#f4bcb7;--ok:#9ccc6a;--okBg:#1f2b16;--badBg:#3a171b;--khaki:#cdb173;--l0:#41383b;--focus:#8fb0ff;--terrain:#3b3431;--terrainHi:#4b423e}}
+:root[data-theme=dark]{color-scheme:dark;--bg:#141113;--ink:#f3ede9;--soft:#b8adb0;--line:#352d30;--panel:#1c181a;--tint:#231d20;--red:#ff6d64;--btn:#c42a2a;--band:#6a0d14;--bandSoft:#f4bcb7;--ok:#9ccc6a;--okBg:#1f2b16;--badBg:#3a171b;--khaki:#cdb173;--l0:#41383b;--focus:#8fb0ff;--terrain:#3b3431;--terrainHi:#4b423e}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.5 "Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden;-webkit-text-size-adjust:100%}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,4vw);padding-right:max(16px,4vw)}
+h1,h2,h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;line-height:1.05;letter-spacing:-.01em;margin:0;text-wrap:balance}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.hero{background:var(--band);color:#fff;padding:20px 0 18px}
+.hrow{display:flex;justify-content:space-between;align-items:flex-end;gap:12px 20px;flex-wrap:wrap}
+.hero h1{font-size:clamp(40px,10vw,58px)}
+.brand{display:flex;align-items:center;gap:14px}
+.ay{display:block;flex:none;width:clamp(52px,13vw,74px);height:auto;fill:#fff}
+.sub{margin:4px 0 0;color:var(--bandSoft);font-size:16px}
+.stats{display:flex;gap:22px}
+.stats b{display:block;font:700 30px/1 "Barlow Condensed","Arial Narrow",sans-serif;white-space:nowrap}
+.stats small{font-size:17px;font-weight:600;color:var(--bandSoft)}
+.stats span{font-size:14px;color:var(--bandSoft)}
+main{padding-top:18px;padding-bottom:36px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.intro{background:var(--tint);border:1.5px solid var(--ink)}
+.intro h2{font-size:26px}
+.intro ol{margin:10px 0 0;padding-left:22px}
+.intro li{margin-bottom:6px}
+.intro li::marker{font-weight:700;color:var(--red)}
+.start{border:1.5px solid var(--ink);box-shadow:5px 5px 0 var(--red)}
+.review{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 18px;align-items:center}
+.big{font:700 clamp(64px,16vw,92px)/.9 "Barlow Condensed","Arial Narrow",sans-serif;color:var(--red)}
+.review h2{font-size:30px}
+.review p{margin:4px 0 0;color:var(--soft)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:10px;border:0;background:var(--btn);color:#fff;font-weight:700;font-size:17px}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.wide{width:100%;min-height:58px;font-size:20px;margin-top:16px}
+.bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--l0);margin:18px 0 8px}
+.bar i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;color:var(--soft)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
+.note{font-size:14px;color:var(--soft);margin:12px 0 0}
+.note.ok{color:var(--ok);font-weight:600}
+.sec{margin:26px 0 6px;font-size:28px}
+.lead{margin:0 0 12px;color:var(--soft)}
+.chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.chip,.tile{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1.5px solid var(--line);background:var(--panel)}
+.chip{min-height:64px;padding:12px 14px;border-radius:12px}
+.chip b{font-size:17px;line-height:1.2}
+.chip span,.tile p{font-size:14px;color:var(--soft);margin:0}
+.chip:hover,.tile:hover{border-color:var(--red)}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tile{padding:16px;border-radius:14px;min-height:112px}
+.tile h3{font-size:25px;margin-bottom:4px;overflow-wrap:anywhere}
+.tile .cnt{color:var(--red);font-weight:700}
+footer{margin-top:30px;padding-top:14px;border-top:1px solid var(--line);font-size:14px;color:var(--soft)}
+.topbar{position:sticky;top:0;z-index:5;background:var(--band);color:#fff}
+.topbar .wrap{display:flex;align-items:center;gap:12px;min-height:56px}
+.back{background:transparent;border:0;color:#fff;font-weight:600;min-height:44px;padding:0 6px 0 0;white-space:nowrap}
+.topbar .t{flex:1;font:700 21px/1.1 "Barlow Condensed","Arial Narrow",sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .n{font-weight:600;white-space:nowrap}
+.prog{height:4px;background:rgba(255,255,255,.25)}
+.prog i{display:block;height:100%;background:#fff;transition:width .3s}
+.slip{margin-top:20px;border:1.5px solid var(--ink);border-radius:4px;background:var(--panel);box-shadow:5px 5px 0 var(--red)}
+.slip header{display:flex;justify-content:space-between;flex-wrap:wrap;gap:2px 10px;padding:8px 14px;border-bottom:1.5px dashed var(--ink);font-size:14px;font-weight:600}
+.slip .q{padding:18px 14px 20px;font-size:clamp(20px,5.2vw,24px);font-weight:600;line-height:1.35}
+.slip .q.pq{font:700 clamp(30px,8vw,38px)/1.05 "Barlow Condensed","Arial Narrow",sans-serif}
+.ask{margin:22px 0 0;font-weight:700}
+.opts{display:grid;gap:10px;margin-top:10px}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;min-height:52px;padding:10px 16px;border-radius:10px;border:1.5px solid var(--line);background:var(--panel);font-size:17px;font-weight:600;color:var(--ink)}
+.opt:not(:disabled):hover{border-color:var(--ink)}
+.opt:disabled{cursor:default;opacity:1}
+.opt.ok{border-color:var(--ok);background:var(--okBg)}
+.opt.bad{border-color:var(--red);background:var(--badBg)}
+.opt small{flex:none;font-size:13px;font-weight:700}
+.opt.ok small{color:var(--ok)}
+.opt.bad small{color:var(--red)}
+.opt .od{display:block;font-size:15px;font-weight:600;color:var(--soft)}
+.pair .opt{min-height:76px;font-size:20px}
+.vs{text-align:center;font-size:14px;color:var(--soft);margin:-2px 0}
+.compass{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:"w c e" ". s .";gap:10px;margin-top:10px}
+.compass .opt{flex-direction:column;justify-content:center;text-align:center;min-height:76px;padding:10px 8px}
+.compass .c{grid-area:c;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:14px;color:var(--soft)}
+.compass .c::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--red);margin-bottom:4px}
+.fb{margin-top:16px;padding:14px 16px;border-radius:10px;background:var(--tint)}
+.fb b{display:block;font-size:18px}
+.fb.ok b{color:var(--ok)}
+.fb.bad b{color:var(--red)}
+.fb p{margin:4px 0 0}
+.fb .again{font-size:14px;color:var(--soft)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.phase{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:0 12px;margin:28px 0 4px}
+.phase h2{font-size:28px}
+.phase span{color:var(--soft);font-size:15px;font-weight:600}
+.placed{list-style:none;margin:10px 0 0 7px;padding:0 0 0 20px;border-left:2px solid var(--red)}
+.placed li{position:relative;padding:4px 0 14px}
+.placed li::before{content:"";position:absolute;left:-28px;top:9px;width:14px;height:14px;border-radius:50%;background:var(--red);border:3px solid var(--bg)}
+.placed .when{font-size:14px;color:var(--soft);font-weight:600}
+.placed b{display:block;font-size:18px;line-height:1.25}
+.placed .nt{display:block;font-size:15px;color:var(--soft)}
+.rows{list-style:none;margin:0;padding:0}
+.rows li{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.rows .c{flex:none;font-weight:700;color:var(--red);white-space:nowrap}
+.rows.qa li{display:block}
+.rows.qa b{display:block;color:var(--ok)}
+.empty{color:var(--soft);margin:0}
+.link{background:none;border:0;padding:10px 0;color:var(--soft);text-decoration:underline;min-height:44px}
+textarea{width:100%;min-height:170px;font:15px/1.4 "Source Sans 3",system-ui,sans-serif;padding:10px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
+.mh{display:flex;justify-content:space-between;align-items:baseline;gap:2px 12px;flex-wrap:wrap}
+.mh h2{font-size:28px}
+.mh span{color:var(--soft);font-size:15px;font-weight:600}
+.mapbox{margin:10px 0 0}
+.tr{display:block;width:100%;height:auto;overflow:visible}
+.tr .base{fill:var(--terrain);stroke:var(--panel);stroke-width:3;stroke-linejoin:round}
+.tr .fill{fill:var(--red);pointer-events:none;transition:fill-opacity .8s}
+.tr .rg{cursor:pointer}
+.tr .rg:hover .base{fill:var(--terrainHi)}
+.tr .rg.hl .base{stroke:var(--ink);stroke-width:6}
+.tr .hat{fill:url(#hatch);stroke:var(--panel);stroke-width:3}
+.tr .hb{fill:var(--terrain)}
+.tr .hx{stroke:var(--soft);stroke-width:3;opacity:.45}
+.tr .star{fill:var(--ink)}
+.tr .lb{font-family:"Source Sans 3",system-ui,sans-serif;font-size:var(--fs,41px);font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--panel);stroke-width:.24em;stroke-linejoin:round;pointer-events:none}
+.tr .lb.lib .pc{fill:#fff;stroke:var(--btn)}
+.tr .lb.sm{font-size:calc(var(--fs,41px)*.8);font-weight:600;fill:var(--soft)}
+.tr.narrow .nm{display:none}
+.today{margin-top:12px;padding-top:14px;border-top:1.5px dashed var(--line)}
+.dl b{display:block;font:700 26px/1.1 "Barlow Condensed","Arial Narrow",sans-serif}
+.dl span{color:var(--soft)}
+.regs{display:grid;gap:8px}
+.rrow{display:grid;grid-template-columns:minmax(0,1fr) 64px 4.4em;align-items:center;gap:12px;text-align:left;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--panel);min-height:62px}
+.rrow:hover{border-color:var(--red)}
+.rrow b{display:block;font-size:17px;line-height:1.2}
+.rrow small{display:block;font-size:14px;color:var(--soft);line-height:1.3}
+.rbar{height:8px;border-radius:4px;background:var(--l0);overflow:hidden}
+.rbar i{display:block;height:100%;background:var(--red)}
+.rp{text-align:right;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.rrow.lib{border-color:var(--red)}
+.rrow.lib .rp{color:var(--red)}
+.cel{background:var(--band);color:#fff;border-radius:14px;padding:18px;margin-bottom:14px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 16px;align-items:center}
+.cel .st{width:68px;animation:pop .7s ease-out}
+.cel h2{font-size:30px}
+.cel p{margin:6px 0 0;color:var(--bandSoft)}
+@keyframes pop{0%{transform:scale(.2) rotate(-40deg);opacity:0}70%{transform:scale(1.25)}100%{transform:scale(1)}}
+details.topics{margin-top:24px;border-top:1px solid var(--line)}
+details.topics summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:56px;font:700 26px/1.1 "Barlow Condensed","Arial Narrow",sans-serif}
+details.topics summary::-webkit-details-marker{display:none}
+details.topics summary::after{content:"+";font-size:30px;color:var(--red)}
+details.topics[open] summary::after{content:"–"}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:420px){.stats{gap:16px}.compass .opt{font-size:15px}.tile{padding:14px}.tile h3{font-size:22px}}
+</style>
+</head>
+<body>
+<div id="view"></div>
+<script>
+{
+const MONTHS=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+const pd=s=>{const p=s.split("-").map(Number);return new Date(p[0],p[1]-1,p[2])};
+const esc=s=>String(s).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const x=a[i];a[i]=a[j];a[j]=x}return a};
+const $=s=>document.querySelector(s);
+/* ay yıldız: Türk Bayrağı Tüzüğü oranlarıyla */
+const AY=c=>`<svg class="ay ${c||""}" viewBox="-26.0 -26 69.2 52" aria-hidden="true"><path d="M21.125 -13.369A25 25 0 1 0 21.125 13.369A20 20 0 1 1 21.125 -13.369Z"/><path d="M19.583 0.000L28.221 -2.806L28.221 -11.888L33.559 -4.541L42.196 -7.347L36.858 -0.000L42.196 7.347L33.559 4.541L28.221 11.888L28.221 2.806Z"/></svg>`;
+
+const G={
+kongre:{n:"Genelgeler ve kongreler",o:["Havza Genelgesi","Amasya Genelgesi","Erzurum Kongresi","Sivas Kongresi","Amasya Görüşmeleri","Misak-ı Millî"]},
+antlasma:{n:"Antlaşmalar",o:["Mondros Ateşkesi","Sevr Antlaşması","Gümrü Antlaşması","Moskova Antlaşması","Kars Antlaşması","Ankara Antlaşması","Mudanya Ateşkesi","Lozan Antlaşması"]},
+muharebe:{n:"Muharebeler",o:["I. İnönü Muharebesi","II. İnönü Muharebesi","Kütahya-Eskişehir Muharebeleri","Sakarya Meydan Muharebesi","Büyük Taarruz"]},
+meclis:{n:"TBMM kararları",o:["Hıyanet-i Vataniye Kanunu","İstiklal Mahkemeleri","Teşkilât-ı Esasiye","Başkomutanlık Kanunu","Tekâlif-i Millîye","Saltanatın kaldırılması"]},
+cemiyet:{n:"Cemiyetler",o:["Wilson Prensipleri Cemiyeti","İngiliz Muhipleri Cemiyeti","Trakya-Paşaeli Cemiyeti","Kilikyalılar Cemiyeti","Millî Kongre Cemiyeti","Redd-i İlhak Cemiyeti","Mavri Mira","Pontus Rum Cemiyeti","Taşnak ve Hınçak","Kürt Teali Cemiyeti"]},
+cephe:{n:"Cepheler",o:["Batı Cephesi","Doğu Cephesi","Güney Cephesi"]}
+};
+
+const C=[
+["k1","kongre","Havza Genelgesi","İşgallerin mitinglerle protesto edilmesi, İtilaf temsilcilerine protesto telgrafları çekilmesi istendi.","28 Mayıs 1919. Halkı millî bilince uyandırmaya yönelik ilk adım."],
+["k2","kongre","Havza Genelgesi","Protesto mitinglerinde Hristiyan halka zarar verilmemesi istendi.","Amaç, İtilaf Devletlerine yeni işgaller için bahane vermemekti."],
+["k3","kongre","Amasya Genelgesi","“Milletin istiklalini yine milletin azim ve kararı kurtaracaktır” denildi.","Kurtuluş Savaşı'nın amacı (bağımsızlık) ve yöntemi (millet eliyle) ilk kez açıkça yazıldı; millî egemenliğe vurgu var."],
+["k4","kongre","Amasya Genelgesi","İstanbul Hükûmeti'nin sorumluluğunu yerine getiremediği açıkça belirtildi.","Bu yüzden ihtilal niteliği taşıyan ilk belge sayılır."],
+["k5","kongre","Amasya Genelgesi","Sivas'ta ulusal bir kongre toplanması kararlaştırıldı.","Kararı Amasya verdi, kongre Sivas'ta toplandı. Soru “kararlaştırıldı” diyorsa Amasya."],
+["k6","kongre","Amasya Genelgesi","Milletin sesini duyurmak için her türlü etki ve denetimden uzak bir kurul oluşturulması gerektiği belirtildi.","Fikir Amasya'da doğdu; Temsil Heyeti ilk kez Erzurum'da kuruldu."],
+["k7","kongre","Erzurum Kongresi","Manda ve himaye ilk kez reddedildi.","Sivas'ta manda yeniden tartışıldı ve reddi kesinleşti. “İlk kez” görürsen Erzurum."],
+["k8","kongre","Erzurum Kongresi","Millî sınırlar içinde vatanın bir bütün olduğu, parçalanamayacağı ilk kez belirtildi.","Millî sınır kavramı Erzurum'da doğdu, Misak-ı Millî'de netleşti."],
+["k9","kongre","Erzurum Kongresi","Temsil Heyeti ilk kez oluşturuldu ve başına Mustafa Kemal getirildi.","Erzurum'da 9 kişilik heyet seçildi; Sivas'ta genişletildi."],
+["k10","kongre","Erzurum Kongresi","Toplanış biçimi bölgesel, aldığı kararlar ulusal niteliktedir.","Delegeler doğu illerinden geldi ama kararlar bütün vatanı kapsadı."],
+["k11","kongre","Sivas Kongresi","Bütün yararlı cemiyetler Anadolu ve Rumeli Müdafaa-i Hukuk Cemiyeti adı altında birleştirildi.","Kuvâ-yı Milliye tek merkezden yönetilir hale geldi."],
+["k12","kongre","Sivas Kongresi","Hem toplanış biçimi hem de aldığı kararlar bakımından ulusal bir kongredir.","Erzurum'dan farkı: delegeler yurdun her yerinden geldi."],
+["k13","kongre","Sivas Kongresi","Temsil Heyeti genişletilerek bütün yurdu temsil eder hale getirildi.","Heyet Erzurum'da kurulmuştu, burada yetkisi bütün yurda yayıldı."],
+["k14","kongre","Sivas Kongresi","Görüşleri duyurmak için İrade-i Milliye gazetesi çıkarıldı.","Hâkimiyet-i Milliye ise Ocak 1920'de Ankara'da çıktı; ikisini karıştırma."],
+["k15","kongre","Sivas Kongresi","Ali Fuat Paşa, Batı Anadolu Kuvâ-yı Milliye Komutanlığı'na getirildi.","Batı'daki dağınık direnişi tek komutaya bağlamak için."],
+["k16","kongre","Amasya Görüşmeleri","Temsil Heyeti, İstanbul Hükûmeti tarafından hukuken tanınmış oldu.","Ali Rıza Paşa hükümeti adına Salih Paşa ile görüşüldü."],
+["k17","kongre","Amasya Görüşmeleri","Mebusan Meclisi'nin İstanbul dışında güvenli bir yerde toplanması istendi ama kabul edilmedi.","Meclis İstanbul'da toplandı, Misak-ı Millî'yi kabul etti ve sonra dağıtıldı."],
+["k18","kongre","Misak-ı Millî","Son Osmanlı Mebusan Meclisi tarafından kabul edildi.","28 Ocak 1920. Kurtuluş Savaşı'nın hedeflerini ve sınırlarını belirleyen belge."],
+["k19","kongre","Misak-ı Millî","Kars, Ardahan, Batum ve Batı Trakya'nın geleceğinin halkoylamasıyla belirlenmesi istendi.","Halkoylaması isteği Misak-ı Millî sorularının en sevilen ayrıntısıdır."],
+["k20","kongre","Misak-ı Millî","Kabulünün ardından İtilaf Devletleri İstanbul'u resmen işgal etti.","16 Mart 1920'de meclis dağıtıldı; bu da TBMM'nin açılmasının yolunu açtı."],
+["k21","kongre","Misak-ı Millî","Siyasi, adli ve mali gelişmeyi engelleyen sınırlamaların (kapitülasyonların) kaldırılması istendi.","Bu hedefe Lozan'da tam olarak ulaşıldı."],
+["a1","antlasma","Mondros Ateşkesi","7. maddeyle İtilaf Devletleri, güvenliklerini tehdit eden bir durumda herhangi bir stratejik noktayı işgal etme hakkı aldı.","30 Ekim 1918. İşgallerin dayanağı yapılan madde."],
+["a2","antlasma","Mondros Ateşkesi","Altı vilayette karışıklık çıkarsa buraların işgal edilebileceği belirtildi.","24. madde. Doğu Anadolu'da Ermeni devleti kurma planına zemin hazırladı."],
+["a3","antlasma","Sevr Antlaşması","Mebusan Meclisi onaylamadığı için hukuken geçersizdir.","Saltanat Şûrası kabul etti, Osmanlı delegeleri imzaladı; meclis kapalı olduğu için onaylanamadı."],
+["a4","antlasma","Sevr Antlaşması","Doğu Anadolu'da bir Ermeni devleti kurulması öngörüldü.","10 Ağustos 1920. TBMM, imzalayanları vatan haini saydı."],
+["a5","antlasma","Gümrü Antlaşması","TBMM'nin uluslararası alanda imzaladığı ilk antlaşmadır.","3 Aralık 1920, Ermenistan ile. Doğu Cephesi kapandı."],
+["a6","antlasma","Gümrü Antlaşması","Ermenistan, Sevr Antlaşması'ndan vazgeçtiğini kabul etti.","Doğu'da Sevr'in hükümleri boşa çıktı."],
+["a7","antlasma","Moskova Antlaşması","Batum Gürcistan'a bırakıldı; Misak-ı Millî'den ilk taviz verildi.","16 Mart 1921, Sovyet Rusya ile."],
+["a8","antlasma","Moskova Antlaşması","Sovyet Rusya, TBMM'nin tanımadığı hiçbir antlaşmayı tanımayacağını kabul etti.","Böylece Sevr'i dolaylı olarak reddetmiş oldu."],
+["a9","antlasma","Kars Antlaşması","Ermenistan, Azerbaycan ve Gürcistan ile imzalandı; doğu sınırımız bugünkü halini aldı.","13 Ekim 1921, Sovyet Rusya aracılığıyla. Moskova'nın hükümleri bu devletlerce de onaylandı."],
+["a10","antlasma","Ankara Antlaşması","TBMM'yi tanıyan ilk İtilaf devletiyle imzalandı.","20 Ekim 1921, Fransa ile. İtilaf cephesi bölünmeye başladı."],
+["a11","antlasma","Ankara Antlaşması","Hatay dışında bugünkü güney sınırımız çizildi.","Hatay'a özel bir yönetim verildi; Hatay 1939'da Türkiye'ye katıldı."],
+["a12","antlasma","Mudanya Ateşkesi","Doğu Trakya savaşılmadan kurtarıldı.","11 Ekim 1922. Kurtuluş Savaşı'nın askerî safhası sona erdi."],
+["a13","antlasma","Mudanya Ateşkesi","İstanbul ve Boğazlar'ın yönetimi TBMM'ye bırakıldı.","Barış imzalanana kadar İtilaf askerleri burada kaldı; Refet Paşa TBMM adına İstanbul'a gönderildi."],
+["a14","antlasma","Lozan Antlaşması","Kapitülasyonlar tamamen kaldırıldı.","24 Temmuz 1923. Misak-ı Millî'nin adli ve mali hedefine ulaşıldı."],
+["a15","antlasma","Lozan Antlaşması","Musul sorunu çözülemedi, İngiltere ile ikili görüşmelere bırakıldı.","1926 Ankara Antlaşması ile Musul Irak'a bırakıldı."],
+["a16","antlasma","Lozan Antlaşması","Boğazlar, başkanı Türk olan uluslararası bir komisyonun denetimine bırakıldı.","1936 Montrö ile Boğazlar'da tam egemenlik sağlandı."],
+["m1","muharebe","I. İnönü Muharebesi","Düzenli ordunun Yunanlılara karşı kazandığı ilk zaferdir.","6–10 Ocak 1921, Batı Cephesi."],
+["m2","muharebe","I. İnönü Muharebesi","Bu zaferden kısa süre sonra Teşkilât-ı Esasiye kabul edildi ve Londra Konferansı toplandı.","Zafer, TBMM'nin hem içeride hem dışarıda elini güçlendirdi."],
+["m3","muharebe","II. İnönü Muharebesi","Mustafa Kemal, “Siz orada yalnız düşmanı değil, milletin makûs talihini de yendiniz” dedi.","23 Mart – 1 Nisan 1921."],
+["m4","muharebe","II. İnönü Muharebesi","Yunan ordusu İnönü'de ikinci kez durduruldu.","23 Mart – 1 Nisan 1921. “Makûs talih” sözü bu zaferden sonra söylendi; I. İnönü ile karıştırma."],
+["m5","muharebe","Kütahya-Eskişehir Muharebeleri","Yenilginin ardından ordu Sakarya Nehri'nin doğusuna çekildi.","10–24 Temmuz 1921. Meclisin Kayseri'ye taşınması bile tartışıldı."],
+["m6","muharebe","Kütahya-Eskişehir Muharebeleri","Bu yenilgi üzerine Mustafa Kemal'e Başkomutanlık yetkisi verildi.","5 Ağustos 1921, Başkomutanlık Kanunu."],
+["m7","muharebe","Sakarya Meydan Muharebesi","Mustafa Kemal'e mareşal rütbesi ve gazi unvanı verildi.","23 Ağustos – 13 Eylül 1921, 22 gün 22 gece."],
+["m8","muharebe","Sakarya Meydan Muharebesi","“Hatt-ı müdafaa yoktur, sath-ı müdafaa vardır” anlayışıyla savunma yapıldı.","Savunma tek bir çizgide yapılmaz, bütün yurt toprağı savunulur."],
+["m9","muharebe","Sakarya Meydan Muharebesi","1683 Viyana bozgunundan beri süren geri çekilme bu savaşla durdu.","Türk ordusu savunmadan taarruza geçme dönemine girdi."],
+["m10","muharebe","Sakarya Meydan Muharebesi","Zaferin ardından Kars ve Ankara antlaşmaları imzalandı.","Diplomatik sonuçları en geniş muharebe."],
+["m11","muharebe","Büyük Taarruz","Başkomutan Meydan Muharebesi ile Yunan ordusunun büyük kısmı yok edildi.","26 Ağustos 1922'de başladı, 30 Ağustos'ta belirleyici muharebe yapıldı."],
+["m12","muharebe","Büyük Taarruz","“Ordular, ilk hedefiniz Akdeniz'dir. İleri!” emri verildi.","9 Eylül 1922'de İzmir kurtarıldı."],
+["c1","meclis","Hıyanet-i Vataniye Kanunu","TBMM'nin otoritesini tanımayanların vatan haini sayılmasını öngördü.","29 Nisan 1920. İç isyanlarla mücadele için çıkarıldı."],
+["c2","meclis","İstiklal Mahkemeleri","Firari askerleri ve isyancıları yargılamak için kuruldu; üyeleri milletvekilleriydi.","Eylül 1920. Milletvekillerinin yargılaması güçler birliğinin örneğidir."],
+["c3","meclis","Teşkilât-ı Esasiye","“Egemenlik kayıtsız şartsız milletindir” ilkesi ilk kez anayasaya girdi.","20 Ocak 1921. TBMM'nin ilk anayasası."],
+["c4","meclis","Teşkilât-ı Esasiye","Kanun-i Esasi'yi yürürlükten kaldırmadı; ona aykırı olmayan maddeler geçerli kaldı.","Bu yüzden iki anayasa bir süre birlikte yürürlükteydi."],
+["c5","meclis","Teşkilât-ı Esasiye","Yasama ve yürütme yetkisinin mecliste toplandığı güçler birliği ilkesi anayasaya girdi.","TBMM bu ilkeyle açılmıştı; anayasa bunu yazıya geçirdi."],
+["c6","meclis","Başkomutanlık Kanunu","TBMM'nin yetkileri üç aylığına Mustafa Kemal'e devredildi.","Kütahya-Eskişehir yenilgisinden sonra; süresi sonradan uzatıldı."],
+["c7","meclis","Tekâlif-i Millîye","Ordunun ihtiyaçları için halkın elindeki yiyecek, giyecek ve taşıtların bir kısmına el konuldu.","7–8 Ağustos 1921, Sakarya öncesi. Topyekûn savaşın örneği."],
+["c8","meclis","Saltanatın kaldırılması","Lozan'a İstanbul Hükûmeti'nin de çağrılması üzerine alınan karardır.","1 Kasım 1922. Osmanlı Devleti hukuken sona erdi."],
+["c9","meclis","Saltanatın kaldırılması","Halifelik ile saltanat birbirinden ayrıldı.","Halifelik 3 Mart 1924'e kadar sürdü."],
+["s1","cemiyet","Wilson Prensipleri Cemiyeti","Amerikan mandasını savundu.","İstanbul'da aydınlar kurdu; manda yanlısı olduğu için zararlı cemiyetler arasında sayılır."],
+["s2","cemiyet","İngiliz Muhipleri Cemiyeti","İngiliz himayesini istedi.","Zararlı cemiyet; padişah çevresinden destek gördü."],
+["s3","cemiyet","Trakya-Paşaeli Cemiyeti","Edirne merkezliydi; Doğu Trakya'nın Yunanlılara verilmesini engellemek istedi.","Yararlı cemiyet."],
+["s4","cemiyet","Kilikyalılar Cemiyeti","Adana ve çevresini Fransız-Ermeni işgaline karşı korumak için kuruldu.","Yararlı cemiyet; Güney Cephesi ile bağlantılı."],
+["s5","cemiyet","Millî Kongre Cemiyeti","İstanbul'da kuruldu; yayın ve propagandayla Türk milletinin haklarını dünyaya duyurmaya çalıştı.","Yararlı cemiyet; silahlı mücadele yerine basın-yayınla çalıştı."],
+["s6","cemiyet","Redd-i İlhak Cemiyeti","İzmir'in Yunanistan'a ilhakını reddetmek amacıyla kuruldu.","Yararlı cemiyet; adı amacını söylüyor."],
+["s7","cemiyet","Mavri Mira","Rum Patrikhanesi bünyesinde kuruldu; Bizans'ı yeniden diriltmeyi amaçladı.","Azınlık cemiyeti; Megali İdea ile bağlantılı."],
+["s8","cemiyet","Pontus Rum Cemiyeti","Karadeniz kıyısında bir Rum devleti kurmayı amaçladı.","Bölgedeki karışıklıklar, Mustafa Kemal'in Samsun'a gönderilmesinin resmî gerekçesiydi."],
+["s9","cemiyet","Taşnak ve Hınçak","Doğu Anadolu'da bir Ermeni devleti kurmayı amaçladı.","Azınlık cemiyetleri; Doğu Cephesi'nin arka planı."],
+["s10","cemiyet","Kürt Teali Cemiyeti","Doğu Anadolu'da bağımsız bir Kürt devleti kurmayı amaçladı.","Zararlı cemiyetler arasında sayılır."],
+["f1","cephe","Doğu Cephesi","Kâzım Karabekir komutasında Ermenilere karşı savaşıldı.","Sarıkamış, Kars ve Gümrü geri alındı."],
+["f2","cephe","Doğu Cephesi","TBMM'nin ilk askerî başarısı bu cephede kazanıldı.","Gümrü Antlaşması da TBMM'nin ilk uluslararası antlaşmasıdır."],
+["f3","cephe","Doğu Cephesi","Gümrü Antlaşması ile kapandı.","3 Aralık 1920."],
+["f4","cephe","Güney Cephesi","Fransızlar ve Ermeni çetelerine karşı mücadele büyük ölçüde Kuvâ-yı Milliye ile yürütüldü.","Antep, Maraş ve Urfa'da halk direnişi belirleyiciydi."],
+["f5","cephe","Güney Cephesi","Antep savunması ve Şahin Bey bu cephenin kahramanlarıdır.","TBMM, Antep'e 1921'de “Gazi” unvanını verdi."],
+["f6","cephe","Güney Cephesi","Maraş direnişinin simge isimlerinden biri Sütçü İmam'dır.","Maraş 1973'te “Kahraman” unvanını aldı."],
+["f7","cephe","Güney Cephesi","Ankara Antlaşması ile kapandı.","20 Ekim 1921, Fransa ile."],
+["f8","cephe","Güney Cephesi","Kuvâ-yı Milliye'nin ilk silahlı direnişi Dörtyol'da Fransızlara karşı yapıldı.","19 Aralık 1918. “İlk kurşun” Dörtyol'da atıldı."],
+["f9","cephe","Güney Cephesi","Urfa'daki direniş sonradan şehre “Şanlı” unvanını kazandırdı.","Şanlıurfa adı 1984'te verildi."],
+["f10","cephe","Batı Cephesi","Yunanlılara karşı düzenli ordu ile savaşıldı.","İnönü, Sakarya ve Büyük Taarruz bu cephededir."],
+["f11","cephe","Batı Cephesi","Kütahya-Eskişehir'de geri çekilen ordu, Sakarya'da savunma yaptı.","Sakarya Ankara'ya çok yakındı; savaş başkenti korudu."],
+["f12","cephe","Batı Cephesi","Mudanya Ateşkes Antlaşması ile kapandı.","11 Ekim 1922."]
+].map(r=>({id:r[0],g:r[1],a:r[2],q:r[3],n:r[4]}));
+const BY={};C.forEach(c=>{BY[c.id]=c});
+
+const T=[
+["t1","Mondros Ateşkes Antlaşması","1918-10-30","","Osmanlı fiilen savaştan çekildi; 7. ve 24. maddeler işgallerin kapısını açtı."],
+["t2","İzmir'in işgali","1919-05-15","","Yunan işgali, Kuvâ-yı Milliye'nin doğuşunu hızlandırdı."],
+["t3","Mustafa Kemal'in Samsun'a çıkışı","1919-05-19","","Milli Mücadele'nin başlangıcı kabul edilir."],
+["t4","Havza Genelgesi","1919-05-28","","Protesto mitingleriyle halkı uyandırma adımı."],
+["t5","Amasya Genelgesi","1919-06-22","","Mücadelenin gerekçesi, amacı ve yöntemi ilk kez yazıldı."],
+["t6","Erzurum Kongresi","1919-07-23","1919-08-07","Bölgesel toplandı, ulusal kararlar aldı; manda ilk kez reddedildi."],
+["t7","Sivas Kongresi","1919-09-04","1919-09-11","Cemiyetler birleşti; hem toplanış hem karar bakımından ulusal."],
+["t8","Amasya Görüşmeleri","1919-10-20","1919-10-22","İstanbul Hükûmeti, Temsil Heyeti'ni muhatap aldı."],
+["t9","Temsil Heyeti'nin Ankara'ya gelişi","1919-12-27","","Ankara mücadelenin merkezi oldu."],
+["t10","Misak-ı Millî'nin kabulü","1920-01-28","","Son Osmanlı Mebusan Meclisi millî sınırları ve hedefleri belirledi."],
+["t11","İstanbul'un resmen işgali","1920-03-16","","Mebusan Meclisi dağıtıldı; yeni bir meclisin yolu açıldı."],
+["t12","TBMM'nin açılışı","1920-04-23","","Millî egemenliğe dayanan meclis Ankara'da açıldı."],
+["t13","Sevr Antlaşması","1920-08-10","","Mebusan Meclisi onaylamadığı için hukuken geçersiz kaldı."],
+["t14","Gümrü Antlaşması","1920-12-03","","TBMM'nin ilk uluslararası antlaşması; Doğu Cephesi kapandı."],
+["t15","I. İnönü Muharebesi","1921-01-06","1921-01-10","Düzenli ordunun Yunanlılara karşı ilk zaferi."],
+["t16","Teşkilât-ı Esasiye Kanunu","1921-01-20","","TBMM'nin ilk anayasası; egemenlik milletindir."],
+["t17","Londra Konferansı","1921-02-21","1921-03-12","İtilaf Devletleri TBMM'yi dolaylı olarak muhatap aldı."],
+["t18","İstiklal Marşı'nın kabulü","1921-03-12","","Mehmet Âkif'in şiiri millî marş olarak kabul edildi."],
+["t19","Moskova Antlaşması","1921-03-16","","Sovyet Rusya ile; Batum Gürcistan'a bırakıldı."],
+["t20","II. İnönü Muharebesi","1921-03-23","1921-04-01","“Milletin makûs talihini de yendiniz.”"],
+["t21","Kütahya-Eskişehir Muharebeleri","1921-07-10","1921-07-24","Ordu Sakarya'nın doğusuna çekildi."],
+["t22","Başkomutanlık Kanunu","1921-08-05","","Meclisin yetkileri üç aylığına Mustafa Kemal'e verildi."],
+["t23","Tekâlif-i Millîye Emirleri","1921-08-07","1921-08-08","Halkın imkânları ordu için seferber edildi."],
+["t24","Sakarya Meydan Muharebesi","1921-08-23","1921-09-13","22 gün 22 gece; Mustafa Kemal'e mareşal rütbesi ve gazi unvanı."],
+["t25","Kars Antlaşması","1921-10-13","","Kafkas cumhuriyetleriyle; doğu sınırı kesinleşti."],
+["t26","Ankara Antlaşması","1921-10-20","","Fransa ile; TBMM'yi tanıyan ilk İtilaf devleti."],
+["t27","Büyük Taarruz'un başlaması","1922-08-26","","Kocatepe'den başlayan son büyük harekât."],
+["t28","Başkomutan Meydan Muharebesi","1922-08-30","","Yunan ordusunun büyük kısmı yok edildi."],
+["t29","İzmir'in kurtuluşu","1922-09-09","","Batı Anadolu kurtuldu."],
+["t30","Mudanya Ateşkes Antlaşması","1922-10-11","","Doğu Trakya savaşılmadan alındı; askerî safha bitti."],
+["t31","Saltanatın kaldırılması","1922-11-01","","Osmanlı Devleti hukuken sona erdi."],
+["t32","Lozan Barış Antlaşması","1923-07-24","","Yeni Türk devleti uluslararası alanda tanındı."]
+].map(r=>({id:r[0],name:r[1],s:pd(r[2]),e:pd(r[3]||r[2]),n:r[4]}));
+const TB={};T.forEach(e=>{TB[e.id]=e});
+
+/* sıralama ikilileri: [id, önce olan, sonra olan, ipucu] */
+G.sira={n:"Hangisi önce oldu?",o:[]};
+const P=[
+["p1","t4","t5","Samsun → Havza → Amasya: Mustafa Kemal'in yol sırası."],
+["p2","t5","t6","Genelge kongreleri çağırdı: önce genelge, sonra kongreler."],
+["p3","t6","t7","Doğudan batıya: önce Erzurum, sonra Sivas."],
+["p4","t7","t8","Sivas'tan sonra İstanbul Hükûmeti, Temsil Heyeti ile masaya oturdu."],
+["p5","t2","t3","İzmir 15 Mayıs'ta işgal edildi, Mustafa Kemal dört gün sonra Samsun'daydı."],
+["p6","t9","t10","Temsil Heyeti Aralık 1919'da Ankara'ya geldi, Misak-ı Millî Ocak 1920'de kabul edildi."],
+["p7","t10","t11","Resmî işgal, Misak-ı Millî'ye verilen tepkiydi."],
+["p8","t11","t12","Mebusan Meclisi dağıtılınca Ankara'da yeni meclis açıldı."],
+["p9","t12","t13","Sevr, TBMM açıldıktan yaklaşık dört ay sonra imzalandı; TBMM tanımadı."],
+["p10","t13","t14","Ermenistan Gümrü'de Sevr'den vazgeçti; önce Sevr gelir."],
+["p11","t14","t15","Doğu Cephesi, Batı'daki ilk zaferden önce kapandı."],
+["p12","t15","t16","Zaferden on gün sonra anayasa kabul edildi."],
+["p13","t16","t17","Önce anayasa (Ocak), sonra Londra Konferansı (Şubat)."],
+["p14","t17","t19","Londra Konferansı 12 Mart'ta bitti, Moskova Antlaşması 16 Mart'ta imzalandı."],
+["p15","t19","t20","Moskova 16 Mart'ta imzalandı, II. İnönü 23 Mart'ta başladı."],
+["p16","t18","t20","İstiklal Marşı 12 Mart'ta kabul edildi, II. İnönü 23 Mart'ta başladı."],
+["p17","t21","t22","Önce yenilgi, sonra Mustafa Kemal'e yetki."],
+["p18","t22","t23","Önce yetki verildi; Tekâlif emirleri o yetkiyle çıkarıldı."],
+["p19","t23","t24","Tekâlif-i Millîye, Sakarya'ya hazırlıktı."],
+["p20","t24","t25","Kars ve Ankara antlaşmaları Sakarya zaferinin sonucudur."],
+["p21","t25","t26","Bir hafta arayla: önce doğu sınırı (Kars), sonra güney sınırı (Ankara)."],
+["p22","t19","t25","Kars, Moskova'nın hükümlerini Kafkas cumhuriyetlerine onaylattı; önce Moskova."],
+["p23","t14","t25","Gümrü Ermenistan'la ilk antlaşma; Kars doğu sınırını kesinleştirdi."],
+["p24","t29","t30","Önce zafer, sonra ateşkes masası."],
+["p25","t30","t31","Önce Mudanya, sonra Lozan daveti ve saltanatın kaldırılması."],
+["p26","t31","t32","Saltanat, Lozan'a iki hükümet çağrılınca kaldırıldı; antlaşma ondan sonra imzalandı."]
+].map(r=>({id:r[0],g:"sira",e1:r[1],e2:r[2],a:r[1],n:r[3],q:"Hangisi önce oldu?"}));
+P.forEach(p=>{C.push(p);BY[p.id]=p});
+const PH=[["Hazırlık dönemi","Ekim 1918 – Mart 1920",0,11],["TBMM ve cepheler","Nisan 1920 – Ekim 1921",11,26],["Zafer ve Lozan","Ağustos 1922 – Temmuz 1923",26,32]];
+
+const fmt=ev=>{const s=ev.s,e=ev.e,M=d=>MONTHS[d.getMonth()];
+ if(+s===+e)return `${s.getDate()} ${M(s)} ${s.getFullYear()}`;
+ if(s.getMonth()===e.getMonth())return `${s.getDate()}–${e.getDate()} ${M(s)} ${s.getFullYear()}`;
+ if(s.getFullYear()===e.getFullYear())return `${s.getDate()} ${M(s)} – ${e.getDate()} ${M(e)} ${s.getFullYear()}`;
+ return `${s.getDate()} ${M(s)} ${s.getFullYear()} – ${e.getDate()} ${M(e)} ${e.getFullYear()}`};
+const isP=c=>c.g==="sira";
+const label=(c,o)=>isP(c)?TB[o].name:o;
+const cardQ=c=>isP(c)?`${TB[c.e1].name} / ${TB[c.e2].name}: hangisi önce?`:c.q;
+const cardA=c=>isP(c)?`Önce ${TB[c.e1].name}`:c.a;
+
+/* ---------- ilerleme ---------- */
+const KEY="mm-ayt-v1",IV=[0,1,2,4,7,15],NEW_PER_DAY=12;
+const LV=["Yeni","Öğreniliyor","Pekişiyor","Kalıcı"],LC=["var(--l0)","var(--red)","var(--khaki)","var(--ok)"];
+const freshState=()=>({cards:{},conf:{},tconf:{},streak:0,last:-1,newDay:-1,newCount:0,intro:0,lib:{}});
+let st=freshState();
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.cards)st=Object.assign(freshState(),s)}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+const today=()=>{const d=new Date();return Math.floor((d.getTime()-d.getTimezoneOffset()*6e4)/864e5)};
+const rec=id=>st.cards[id];
+const lvl=id=>{const r=rec(id);if(!r)return 0;return r.b>=5?3:r.b>=3?2:1};
+const counts=ids=>{const n=[0,0,0,0];(ids||C.map(c=>c.id)).forEach(id=>n[lvl(id)]++);return n};
+const streak=()=>{const t=today();return st.last===t||st.last===t-1?st.streak:0};
+function active(){const t=today();if(st.last!==t){st.streak=st.last===t-1?st.streak+1:1;st.last=t}}
+function grade(c,ok,picked){
+ const t=today();active();
+ let r=st.cards[c.id];
+ if(!r){r=st.cards[c.id]={b:0,d:t,w:0,r:0};if(st.newDay!==t){st.newDay=t;st.newCount=0}st.newCount++}
+ if(ok){r.r++;r.lw=0;if(r.d<=t){r.b=Math.min(5,r.b+1);r.d=t+IV[r.b]}}
+ else{r.w++;r.b=1;r.d=t+1;r.lw=1;
+  if(isP(c)){const k=c.e1+"|"+c.e2;st.tconf[k]=(st.tconf[k]||0)+1}
+  else{const k=picked+"→"+c.a;st.conf[k]=(st.conf[k]||0)+1}}
+ save();
+}
+const unseen=f=>C.filter(c=>!rec(c.id)&&f(c));
+function newBatch(n){
+ const pairs=shuf(unseen(isP)),facts=shuf(unseen(c=>!isP(c)));
+ let np=Math.min(n>=8?3:n>=4?2:1,pairs.length,n),nf=Math.min(n-np,facts.length);np=Math.min(pairs.length,n-nf);
+ return pairs.slice(0,np).concat(facts.slice(0,nf)).map(c=>c.id);
+}
+function daily(){
+ const t=today(),used=st.newDay===t?st.newCount:0;
+ const due=C.filter(c=>rec(c.id)&&rec(c.id).d<=t).map(c=>c.id);
+ const fresh=newBatch(Math.max(0,NEW_PER_DAY-used));
+ return {due,fresh,ids:shuf(due.concat(fresh))};
+}
+const dailyIds=()=>daily().ids;
+const extraIds=()=>{const n=newBatch(8);return n.length?shuf(n):pickSet("mix")};
+const pickSet=g=>{const pool=C.filter(c=>g==="mix"?!isP(c):c.g===g);return shuf(shuf(pool).sort((a,b)=>lvl(a.id)-lvl(b.id)).slice(0,10).map(c=>c.id))};
+const hardIds=()=>C.filter(c=>rec(c.id)&&rec(c.id).w>0).sort((a,b)=>rec(b.id).w-rec(a.id).w).slice(0,12).map(c=>c.id);
+
+const view=$("#view");
+const bar=(t,n,p)=>`<div class="topbar"><div class="wrap"><button class="back" data-act="home">‹ Ana sayfa</button><span class="t">${esc(t)}</span><span class="n">${n}</span></div>${p==null?"":`<div class="prog"><i style="width:${Math.round(p*100)}%"></i></div>`}</div>`;
+const levelBar=n=>{const tot=n.reduce((a,b)=>a+b,0)||1;return `<div class="bar">${n.map((v,i)=>`<i style="width:${v/tot*100}%;background:${LC[i]}"></i>`).join("")}</div><div class="legend">${LV.map((l,i)=>`<span><i style="background:${LC[i]}"></i>${l} ${n[i]}</span>`).join("")}</div>`};
+
+const MAP={"W":1000,"H":437,"paths":{"guney":"M526,359 547,364 560,371 566,372 586,383 606,383 633,370 643,364 673,377 700,379 733,371 755,359 783,343 809,344 842,338 860,327 881,334 887,320 910,316 929,322 926,291 898,288 888,271 883,275 854,263 826,267 819,244 816,244 810,246 801,233 783,243 763,243 751,253 728,253 721,262 689,266 689,276 665,283 654,276 637,284 640,296 608,304 617,270 591,251 560,253 549,271 530,266 523,281 502,296 483,296 470,314 459,317 457,334 442,337 425,349 400,359 381,361 358,373 371,389 362,396 341,397 335,421 397,417 450,374 464,380 500,391 520,369 526,359Z","bati":"M294,216 304,211 311,189 306,168 293,153 256,151 253,143 247,141 242,130 260,108 262,80 231,72 230,94 222,109 206,111 181,111 160,115 147,120 117,118 108,111 84,121 73,153 36,157 32,168 29,180 27,186 35,194 30,225 39,244 17,243 54,283 46,307 59,316 64,328 64,335 51,336 60,345 85,344 89,361 89,370 90,374 101,366 119,361 134,376 143,381 154,399 175,411 210,401 221,393 228,369 251,366 269,370 306,390 320,411 335,421 341,397 331,376 298,339 270,328 277,292 288,282 269,261 288,241 294,216Z","dogu":"M929,322 969,317 976,332 1000,312 988,301 983,282 965,276 962,212 944,177 964,172 966,152 963,134 933,134 914,124 920,90 915,74 893,58 875,42 856,34 850,44 803,42 787,59 743,82 732,89 683,80 682,99 669,122 674,149 666,150 645,166 646,213 616,223 591,251 617,270 608,304 640,296 637,284 654,276 665,283 689,276 689,266 721,262 728,253 751,253 763,243 783,243 801,233 810,246 816,244 819,244 826,267 854,263 883,275 888,271 898,288 926,291 929,322Z","merkez":"M591,251 616,223 646,213 645,166 666,150 674,149 669,122 682,99 683,80 660,89 630,90 599,87 579,79 554,63 543,73 527,58 517,40 494,46 483,41 470,16 459,25 430,25 385,20 351,32 317,49 285,65 281,77 262,80 260,108 242,130 247,141 253,143 256,151 293,153 306,168 311,189 304,211 294,216 288,241 269,261 288,282 277,292 270,328 298,339 331,376 341,397 362,396 371,389 358,373 381,361 400,359 425,349 442,337 457,334 459,317 470,314 483,296 502,296 523,281 530,266 549,271 560,253 591,251Z","ist":"M84,121 65,111 42,111 21,127 7,141 0,170 32,168 36,157 73,153 84,121ZM231,72 205,73 160,63 122,40 120,37 116,9 92,11 81,0 62,6 45,4 30,21 41,28 42,46 24,57 25,72 11,95 44,92 47,99 14,114 21,127 39,107 57,100 72,93 84,76 116,73 141,81 159,78 177,90 181,103 159,104 160,115 181,111 206,111 222,109 230,94 231,72Z","hatay":"M520,369 535,376 534,388 512,409 525,437 545,428 546,413 560,371 547,364 526,359 520,369Z"}};
+/* ---------- kurtuluş haritası ---------- */
+const TH=0.6,RO=["merkez","dogu","guney","bati","ist"];
+const REG={
+merkez:{n:"Samsun'dan Ankara'ya",s:"Merkez",sub:"Genelgeler, kongreler, TBMM",note:"Samsun, Havza, Amasya, Sivas ve Ankara: mücadelenin merkezi kuruldu, TBMM 23 Nisan 1920'de açıldı."},
+dogu:{n:"Doğu Cephesi",s:"Doğu",sub:"Erzurum, Gümrü, Moskova, Kars",note:"Gümrü Antlaşması (3 Aralık 1920) ile Doğu Cephesi kapandı, Kars Antlaşması doğu sınırını kesinleştirdi."},
+guney:{n:"Güney Cephesi",s:"Güney",sub:"Antep, Maraş, Urfa, Ankara Antlaşması",note:"Ankara Antlaşması (20 Ekim 1921) ile Güney Cephesi kapandı. Hatay 1939'da anavatana katıldı."},
+bati:{n:"Batı Cephesi",s:"Batı",sub:"İnönü, Sakarya, Büyük Taarruz",note:"Büyük Taarruz'la Yunan ordusu yenildi, 9 Eylül 1922'de İzmir kurtarıldı."},
+ist:{n:"İstanbul ve Trakya",s:"İstanbul",sub:"Mondros, Misak-ı Millî, Mudanya, Lozan",note:"Mudanya ile Doğu Trakya savaşılmadan alındı; Lozan (24 Temmuz 1923) ile bağımsızlık tescillendi."}
+};
+const RC={
+merkez:"k1 k2 k3 k4 k5 k6 k11 k12 k13 k14 k15 k16 k17 c1 c2 c3 c4 c5 c6 c7 s8 p1 p2 p4 p6 p8 p13 p17 p18 p19",
+dogu:"k7 k8 k9 k10 f1 f2 f3 a5 a6 a7 a8 a9 s9 s10 p3 p10 p11 p14 p15 p22 p23",
+guney:"f4 f5 f6 f7 f8 f9 a10 a11 s4 p21",
+bati:"m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11 m12 f10 f11 f12 s6 p5 p12 p16 p20 p24",
+ist:"a1 a2 a3 a4 a12 a13 a14 a15 a16 k18 k19 k20 k21 s1 s2 s3 s5 s7 c8 c9 p7 p9 p25 p26"};
+const RIDS={};RO.forEach(k=>{RIDS[k]=RC[k].split(" ")});
+const LB={merkez:[480,150],dogu:[822,144],guney:[740,300],bati:[160,247],ist:[75,50]};
+const cred=id=>{const r=rec(id);return !r||r.lw?0:Math.min(r.b,5)/5};
+const regProg=()=>{const o={};RO.forEach(k=>{o[k]=RIDS[k].reduce((a,id)=>a+cred(id),0)/RIDS[k].length});return o};
+const libN=()=>RO.filter(k=>st.lib[k]).length;
+const pct=p=>"%"+Math.round(p*100);
+function newlyLib(){const pr=regProg(),out=[];RO.forEach(k=>{if(pr[k]>=TH&&!st.lib[k]){st.lib[k]=today();out.push(k)}});if(out.length){if(RO.every(k=>st.lib[k]))out.push("all");save()}return out}
+const regionIds=r=>shuf(shuf(RIDS[r]).sort((a,b)=>cred(a)-cred(b)).slice(0,10));
+const starPath=(cx,cy,r)=>{let d="";for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.45:r;d+=(i?"L":"M")+(cx+rr*Math.cos(a)).toFixed(1)+","+(cy+rr*Math.sin(a)).toFixed(1)}return d+"Z"};
+function mapSVG(hl){
+ const pr=regProg();
+ const regs=RO.map(k=>{const p=pr[k],lib=st.lib[k],op=lib?1:p<=0?0:0.12+0.5*Math.min(1,p/TH);
+  return `<g class="rg${hl&&hl[k]?" hl":""}" data-act="reg" data-r="${k}"><title>${REG[k].n}: ${pct(p)}</title><path class="base" d="${MAP.paths[k]}"/><path class="fill" d="${MAP.paths[k]}" style="fill-opacity:${op.toFixed(2)}"/></g>`}).join("");
+ const labels=RO.map(k=>{const x=LB[k][0],y=LB[k][1],lib=st.lib[k];return `<text class="lb${lib?" lib":""}" x="${x}" y="${y}" text-anchor="middle"><tspan class="nm" x="${x}">${REG[k].s}</tspan><tspan class="pc" x="${x}" dy="1.05em">${lib?"★":pct(pr[k])}</tspan></text>`}).join("");
+ return `<div class="mapbox"><svg class="tr" viewBox="0 0 ${MAP.W} ${MAP.H+12}" role="img" aria-label="Kurtuluş haritası"><defs><pattern id="hatch" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="14" height="14" class="hb"/><line x1="0" y1="0" x2="0" y2="14" class="hx"/></pattern></defs>${regs}<path class="hat" d="${MAP.paths.hatay}"/><path class="star" d="${starPath(344,165,17)}"/>${labels}<text class="lb sm" x="562" y="430">Hatay · 1939</text></svg></div>`;
+}
+function fitMaps(){document.querySelectorAll(".tr").forEach(s=>{const w=s.getBoundingClientRect().width||340;s.style.setProperty("--fs",(14*MAP.W/w).toFixed(1)+"px");s.classList.toggle("narrow",w<520)})}
+window.addEventListener("resize",fitMaps);
+const celHtml=k=>k==="all"?`<section class="cel">${AY("st")}<div><h2>Harita tamamlandı!</h2><p>24 Temmuz 1923'te Lozan imzalandı. Bütün bölgeleri kurtardın; şimdi tekrarlarla kalıcı hale getir.</p></div></section>`:`<section class="cel">${AY("st")}<div><h2>${REG[k].n} kurtarıldı!</h2><p>${REG[k].note}</p></div></section>`;
+const regRows=()=>{const pr=regProg();return `<div class="regs">${RO.map(k=>{const lib=st.lib[k];return `<button class="rrow${lib?" lib":""}" data-act="reg" data-r="${k}"><span><b>${REG[k].n}</b><small>${REG[k].sub}</small></span><span class="rbar"><i style="width:${Math.round(pr[k]*100)}%"></i></span><span class="rp">${lib?"★ ":""}${pct(pr[k])}</span></button>`}).join("")}</div>`};
+
+/* ---------- ana sayfa ---------- */
+function renderHome(){
+ const t=today(),q=daily(),total=q.ids.length,cel=newlyLib();
+ let body;
+ if(total){const dk=Math.max(1,Math.round(total*0.4));
+  body=`<div class="dl"><b>Bugünün çalışması</b><span>${total} soru, yaklaşık ${dk} dakika.${q.due.length?` ${q.due.length} tanesi tekrar.`:""}</span></div><button class="btn wide" data-act="daily">Başla</button>`}
+ else{const ds=Object.values(st.cards).map(r=>r.d-t).filter(x=>x>0),m=ds.length?Math.min.apply(null,ds):0;
+  body=`<div class="dl"><b>Bugünlük bitti</b><span>${m?`Sıradaki tekrar ${m===1?"yarın":m+" gün sonra"}.`:"Yarın yeni sorular gelecek."} Daha çalışmak istersen haritada bir bölgeye dokun.</span></div><button class="btn wide ghost" data-act="extra">Ekstra tur</button>`}
+ const mixN=Object.keys(st.conf).length+Object.keys(st.tconf).length;
+ view.innerHTML=`<header class="hero"><div class="wrap hrow"><div class="brand">${AY()}<div><h1>Milli Mücadele</h1><p class="sub">AYT Tarih · Mondros'tan Lozan'a</p></div></div>
+ <div class="stats"><div><b>${libN()}<small>/5</small></b><span>kurtarılan bölge</span></div><div><b>${streak()}</b><span>gün seri</span></div></div></div></header>
+ <main class="wrap">
+ ${cel.map(celHtml).join("")}
+ ${st.intro?"":`<section class="panel intro"><h2>Nasıl çalışır?</h2><ol>
+ <li>Her gün bir kez aç ve <b>Başla</b>'ya bas. Günde 5-10 dakika yeter.</li>
+ <li>Doğru bildiğin her soru haritada kendi bölgesini kızartır. Bir bölgenin soruları pekişince o bölge <b>kurtarılır</b>.</li>
+ <li>Bilemediğin soru yarın yine gelir. Karıştırdıklarını hocana gönderebilirsin.</li></ol>
+ <div class="actions"><button class="btn" data-act="introok">Anladım</button></div></section>`}
+ <section class="panel start"><div class="mh"><h2>Kurtuluş haritası</h2><span>${libN()}/5 bölge kurtarıldı</span></div>
+ ${mapSVG()}
+ <div class="today">${body}</div></section>
+ <h2 class="sec">Bölge bölge kurtar</h2><p class="lead">Bir bölgeye dokun, o bölgenin en zayıf 10 sorusu gelsin.</p>
+ ${regRows()}
+ <div class="tiles" style="margin-top:14px">
+ <button class="tile" data-act="krono"><h3>Kronoloji</h3><p>32 olay tarih sırasıyla. Soru çözmeden önce göz gezdir.</p></button>
+ <button class="tile" data-act="mix"><h3>Karıştırdıkların</h3><p>${mixN?`<span class="cnt">${mixN} karışıklık</span> kayıtlı.`:"Yanlışların burada birikir."} Hocana gönderebilirsin.</p></button>
+ </div>
+ <details class="topics"><summary>Konu konu çalış</summary><p class="lead">Bir konuya yüklenmek istersen. Her tur 10 soru.</p>
+ <div class="chips">${["kongre","antlasma","muharebe","meclis","cemiyet","cephe","sira"].map(k=>{const ids=C.filter(c=>c.g===k).map(c=>c.id),n=counts(ids);return `<button class="chip" data-act="set" data-g="${k}"><b>${G[k].n}</b><span>${ids.length-n[0]}/${ids.length} görüldü · ${n[3]} kalıcı</span></button>`}).join("")}<button class="chip" data-act="set" data-g="mix"><b>Karışık</b><span>Bütün konulardan 10 soru</span></button></div></details>
+ <footer>Doktorant Psikolojik Danışman Mustafa Değer · YKS rehberliği</footer>
+ </main>`;
+ fitMaps();
+}
+
+/* ---------- kronoloji ---------- */
+function renderKrono(){
+ view.innerHTML=bar("Kronoloji","",null)+`<main class="wrap"><p class="lead" style="margin-top:6px">Mondros'tan Lozan'a 32 olay. Önce buradan oku, sonra “Hangisi önce oldu?” sorularını çöz.</p>
+ ${PH.map(ph=>`<div class="phase"><h2>${ph[0]}</h2><span>${ph[1]}</span></div><ol class="placed">${T.slice(ph[2],ph[3]).map(e=>`<li><span class="when">${fmt(e)}</span><b>${esc(e.name)}</b><span class="nt">${esc(e.n)}</span></li>`).join("")}</ol>`).join("")}
+ <div class="actions"><button class="btn" data-act="set" data-g="sira">Hangisi önce oldu? sorularını çöz</button></div></main>`;
+}
+
+/* ---------- soru turu ---------- */
+let S=null;
+function startQuiz(title,ids,again,isDaily){if(!ids.length)return renderHome();S={title,q:ids.slice(),i:0,ok:0,total:ids.length,missed:[],re:{},opts:null,ans:null,again,isDaily,before:regProg()};if(location.hash==="#sonuc")navReplace("soru");else if(location.hash!=="#soru")nav("soru");renderQuiz();window.scrollTo(0,0)}
+function makeOpts(c){
+ if(isP(c))return shuf([c.e1,c.e2]);
+ if(c.g==="cephe")return G.cephe.o.slice();
+ return shuf([c.a].concat(shuf(G[c.g].o.filter(o=>o!==c.a)).slice(0,3)));
+}
+function renderQuiz(){
+ const c=BY[S.q[S.i]],g=G[c.g],cep=c.g==="cephe",pr=isP(c),done=S.ans!==null;
+ if(!S.opts)S.opts=makeOpts(c);
+ const btn=(o,i)=>{let cls="opt",tag="";if(done){if(o===c.a){cls+=" ok";tag="doğru"}else if(o===S.ans){cls+=" bad";tag=pr?"":"senin cevabın"}}
+  const inner=pr?`<span>${esc(TB[o].name)}${done?`<span class="od">${fmt(TB[o])}</span>`:""}</span>`:`<span>${esc(o)}</span>`;
+  return `<button class="${cls}" data-act="opt" data-i="${i}"${done?" disabled":""}${cep?` style="grid-area:${["w","e","s"][i]}"`:""}>${inner}${tag?`<small>${tag}</small>`:""}</button>`};
+ let optHtml;
+ if(pr)optHtml=`<div class="opts pair">${btn(S.opts[0],0)}<div class="vs">yoksa</div>${btn(S.opts[1],1)}</div>`;
+ else if(cep)optHtml=`<p class="ask">Bu hangi cepheyle ilgili?</p><div class="compass"><div class="c">Ankara</div>${S.opts.map(btn).join("")}</div>`;
+ else optHtml=`<p class="ask">Bu bilgi hangisine ait?</p><div class="opts">${S.opts.map(btn).join("")}</div>`;
+ const ok=S.ans===c.a;
+ const head=ok?"Doğru.":pr?"Önce olan: "+esc(TB[c.a].name):"Doğrusu: "+esc(c.a);
+ const fb=done?`<div class="fb ${ok?"ok":"bad"}" role="status"><b>${head}</b><p>${esc(c.n)}</p>${!ok&&S.re[c.id]===1?`<p class="again">Bu soru turun sonunda bir kez daha gelecek.</p>`:""}</div><div class="actions"><button class="btn" data-act="next">${S.i+1<S.q.length?"Devam":"Sonucu gör"}</button></div>`:"";
+ view.innerHTML=bar(S.title,`${S.i+1} / ${S.q.length}`,(S.i+(done?1:0))/S.q.length)+`<main class="wrap">
+ <article class="slip"><header><span>Telgraf no. ${String(S.i+1).padStart(2,"0")}</span><span>${pr?"Sıralama":esc(g.n)}</span></header><div class="q${pr?" pq":""}">${esc(c.q)}</div></article>
+ ${optHtml}${fb}</main>`;
+ if(done){const b=$("[data-act=next]");if(b){b.focus({preventScroll:true});b.scrollIntoView({block:"nearest"})}}
+}
+function answer(i){
+ if(S.ans!==null)return;
+ const c=BY[S.q[S.i]],pick=S.opts[i],ok=pick===c.a;
+ S.ans=pick;grade(c,ok,pick);
+ if(!S.re[c.id]){if(ok)S.ok++;else{S.missed.push(c.id);S.q.push(c.id)}S.re[c.id]=ok?2:1}
+ else if(S.re[c.id]===1)S.re[c.id]=3;
+ renderQuiz();
+}
+function nextQ(){S.i++;S.opts=null;S.ans=null;if(S.i>=S.q.length){renderEnd();return navReplace("sonuc")}renderQuiz();window.scrollTo(0,0)}
+function renderEnd(){
+ const after=regProg(),cel=newlyLib(),hl={},moved=RO.filter(k=>Math.round(after[k]*100)>Math.round(S.before[k]*100));moved.forEach(k=>{hl[k]=1});
+ view.innerHTML=bar(S.title,"Bitti",1)+`<main class="wrap" style="padding-top:20px">${cel.map(celHtml).join("")}
+ <section class="panel"><div class="review"><div class="big">${S.ok}/${S.total}</div><div><h2>ilk denemede doğru</h2><p>${S.missed.length?"Yanlış yaptığın sorular yarın yeniden gelecek.":"Hepsi ilk seferde doğru. Bu sorular birkaç gün sonra yeniden gelecek."}</p></div></div></section>
+ <section class="panel"><div class="mh"><h2>Haritada ilerleme</h2><span>${libN()}/5 bölge kurtarıldı</span></div>${mapSVG(hl)}
+ ${moved.length?`<ul class="rows">${moved.map(k=>`<li><span>${REG[k].n}</span><span class="c">${pct(S.before[k])} → ${pct(after[k])}</span></li>`).join("")}</ul>`:`<p class="note">Bu turda harita değişmedi. Yeni sorular ilk doğru cevapta, tekrarlar sonraki günlerde haritayı ilerletir.</p>`}</section>
+ ${S.missed.length?`<section class="panel"><h3 style="font-size:24px">Bu turda karıştırdıkların</h3><ul class="rows qa">${S.missed.map(id=>`<li><span>${esc(cardQ(BY[id]))}</span><b>${esc(cardA(BY[id]))}</b></li>`).join("")}</ul></section>`:""}
+ <div class="actions">${S.isDaily?`<button class="btn" data-act="home">Ana sayfaya dön</button>`:`<button class="btn" data-act="again">Yeni tur</button><button class="btn ghost" data-act="home">Ana sayfa</button>`}</div></main>`;
+ fitMaps();window.scrollTo(0,0);
+}
+
+/* ---------- karıştırdıkların ---------- */
+let R=false;
+const topConf=()=>Object.entries(st.conf).sort((a,b)=>b[1]-a[1]).slice(0,8);
+const topT=()=>Object.entries(st.tconf).filter(([k])=>k.split("|").every(id=>TB[id])).sort((a,b)=>b[1]-a[1]).slice(0,8);
+function summary(){
+ const d=new Date(),n=counts(),L=[`Milli Mücadele tekrar özeti (${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()})`,`Kalıcı ${n[3]}, pekişiyor ${n[2]}, öğreniliyor ${n[1]}, yeni ${n[0]} (toplam ${C.length} soru). Seri: ${streak()} gün.`,`Kurtuluş haritası: ${RO.map(k=>`${REG[k].s} ${pct(regProg()[k])}${st.lib[k]?" (kurtarıldı)":""}`).join(", ")}`];
+ const cf=topConf(),tc=topT(),hd=hardIds().slice(0,6);
+ if(cf.length){L.push("","Karıştırdığım ikililer:");cf.forEach(([k,v])=>{const p=k.split("→");L.push(`- ${p[1]} yerine ${p[0]} dedim (${v} kez)`)})}
+ if(tc.length){L.push("","Sırasını karıştırdıklarım:");tc.forEach(([k,v])=>{const p=k.split("|");L.push(`- Önce ${TB[p[0]].name}, sonra ${TB[p[1]].name} (${v} kez)`)})}
+ if(hd.length){L.push("","En çok yanlış yaptığım sorular:");hd.forEach(id=>L.push(`- ${cardQ(BY[id])} → ${cardA(BY[id])} (${rec(id).w} yanlış)`))}
+ if(!cf.length&&!tc.length)L.push("","Henüz kayıtlı karışıklık yok.");
+ return L.join("\n");
+}
+function renderMix(){
+ const cf=topConf(),tc=topT(),hd=hardIds().slice(0,6);
+ view.innerHTML=bar("Karıştırdıkların","",null)+`<main class="wrap">
+ <section class="panel" style="margin-top:6px"><h2 style="font-size:26px">Genel durum</h2>${levelBar(counts())}</section>
+ <h2 class="sec">Birbirine karıştırdıkların</h2>
+ ${cf.length?`<ul class="rows">${cf.map(([k,v])=>{const p=k.split("→");return `<li><span><b>${esc(p[1])}</b> yerine <b>${esc(p[0])}</b> dedin</span><span class="c">${v}×</span></li>`}).join("")}</ul>`:`<p class="empty">Henüz yok. Birkaç gün çalışınca burada birikecek.</p>`}
+ <h2 class="sec">Sırasını karıştırdıkların</h2>
+ ${tc.length?`<ul class="rows">${tc.map(([k,v])=>{const p=k.split("|");return `<li><span>Önce <b>${esc(TB[p[0]].name)}</b>, sonra <b>${esc(TB[p[1]].name)}</b></span><span class="c">${v}×</span></li>`}).join("")}</ul>`:`<p class="empty">“Hangisi önce oldu?” sorularında yanıldıkça burada görünecek.</p>`}
+ <h2 class="sec">En çok zorlandığın sorular</h2>
+ ${hd.length?`<ul class="rows qa">${hd.map(id=>`<li><span>${esc(cardQ(BY[id]))}</span><b>${esc(cardA(BY[id]))}</b></li>`).join("")}</ul>`:`<p class="empty">Henüz yanlış yaptığın soru yok.</p>`}
+ <div class="actions">${hd.length?`<button class="btn" data-act="hard">Zorlandıklarımı çalış</button>`:""}<button class="btn ghost" data-act="copy">Hocana göndermek için kopyala</button></div>
+ <div id="copyOut"></div>
+ ${R?`<div class="panel" style="margin-top:20px"><b>Tüm ilerleme silinsin mi?</b><p class="note">Sorular, seri ve karışıklık kayıtları sıfırlanır.</p><div class="actions"><button class="btn" data-act="resetyes">Evet, sıfırla</button><button class="btn ghost" data-act="resetno">Vazgeç</button></div></div>`:`<button class="link" data-act="reset">İlerlemeyi sıfırla</button>`}
+ </main>`;
+}
+function copySummary(){
+ const txt=summary(),out=$("#copyOut");
+ const show=()=>{out.innerHTML=`<p class="note">Otomatik kopyalanamadı. Metni seçip kopyala:</p><textarea id="sumText" readonly>${esc(txt)}</textarea>`;const ta=$("#sumText");ta.focus();ta.select()};
+ try{navigator.clipboard.writeText(txt).then(()=>{out.innerHTML=`<p class="note ok">Kopyalandı. WhatsApp'tan hocana yapıştırabilirsin.</p>`},show)}catch(e){show()}
+}
+
+/* ---------- olaylar ---------- */
+/* telefonun geri tuşu: her ekran #adres ile tarayıcı geçmişine yazılır */
+let stack=[""],internal=false;
+function nav(h){if("#"+h===location.hash)return;stack.push(h);internal=true;location.hash=h}
+function navReplace(h){stack[stack.length-1]=h;if("#"+h===location.hash)return;internal=true;location.replace("#"+h)}
+function route(h){window.scrollTo(0,0);if(h==="kronoloji")return renderKrono();if(h==="karistirdiklarin")return renderMix();if(h==="soru"&&S&&S.i<S.q.length)return renderQuiz();if(h==="sonuc"&&S&&S.i>=S.q.length)return renderEnd();renderHome()}
+function goHome(){const n=stack.length-1;if(n>0)history.go(-n);else{renderHome();window.scrollTo(0,0)}}
+const go=goHome;
+window.addEventListener("hashchange",()=>{
+ const h=location.hash.slice(1);
+ if(internal){internal=false;return}
+ const i=stack.lastIndexOf(h);
+ if(i>=0)stack=stack.slice(0,i+1);else stack.push(h);
+ route(h);
+});
+document.addEventListener("click",ev=>{
+ const b=ev.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
+ if(a==="home")return go();
+ if(a==="introok"){st.intro=1;save();return renderHome()}
+ if(a==="daily")return startQuiz("Bugünün çalışması",dailyIds(),dailyIds,true);
+ if(a==="extra")return startQuiz("Ekstra tur",extraIds(),extraIds);
+ if(a==="set"){const g=b.dataset.g,f=()=>pickSet(g);return startQuiz(g==="mix"?"Karışık":G[g].n,f(),f)}
+ if(a==="opt")return answer(+b.dataset.i);
+ if(a==="next")return nextQ();
+ if(a==="again"){const ids=S.again();return ids.length?startQuiz(S.title,ids,S.again):go()}
+ if(a==="reg"){const r=b.dataset.r,f=()=>regionIds(r);return startQuiz(REG[r].n,f(),f)}
+ if(a==="krono"){renderKrono();window.scrollTo(0,0);return nav("kronoloji")}
+ if(a==="mix"){R=false;renderMix();window.scrollTo(0,0);return nav("karistirdiklarin")}
+ if(a==="hard")return startQuiz("Zorlandıkların",hardIds(),hardIds);
+ if(a==="copy")return copySummary();
+ if(a==="reset"){R=true;return renderMix()}
+ if(a==="resetno"){R=false;return renderMix()}
+ if(a==="resetyes"){st=freshState();st.intro=1;save();R=false;return go()}
+});
+
+const hot=window.claude&&window.claude.hot;
+if(hot&&typeof hot.snapshot==="function")hot.snapshot(()=>st);
+const boot=d=>{if(d&&d.cards)st=Object.assign(freshState(),d);if(location.hash&&location.hash!=="#"){internal=true;location.replace("#")}renderHome()};
+if(hot&&typeof hot.ready==="function")hot.ready(boot);else boot(hot&&hot.data||{});
+}
+</script>
+</body>
+</html>
